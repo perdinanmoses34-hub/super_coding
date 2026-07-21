@@ -15,7 +15,7 @@ async function runTest() {
   const app = initializeApp(config);
 
   // Test 1: Test with custom database ID
-  const customDbId = "ai-studio-supercoding-90a28953-19d3-40a0-908e-f7b84ded0118";
+  const customDbId = config.firestoreDatabaseId || "ai-studio-supercoding-05cba2b8-9e7c-4257-bfb6-5f3525816084";
   console.log(`\n--- Test 1: Connecting with custom DB ID "${customDbId}" ---`);
   try {
     const db = getFirestore(app, customDbId);

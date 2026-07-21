@@ -7,7 +7,7 @@ async function runTest() {
   const CONFIG_PATH = path.join(process.cwd(), "firebase-applet-config.json");
   const config = JSON.parse(fs.readFileSync(CONFIG_PATH, "utf-8"));
   const app = initializeApp(config);
-  const db = getFirestore(app, "ai-studio-supercoding-90a28953-19d3-40a0-908e-f7b84ded0118");
+  const db = config.firestoreDatabaseId ? getFirestore(app, config.firestoreDatabaseId) : getFirestore(app);
 
   const testDocRef = doc(db, "church_db", "test_write");
   console.log("Attempting to write to church_db/test_write...");

@@ -18,10 +18,10 @@ if (fs.existsSync(CONFIG_PATH)) {
   try {
     const config = JSON.parse(fs.readFileSync(CONFIG_PATH, "utf-8"));
     firebaseApp = initializeApp(config);
-    // Use custom databaseId from config if provided, fallback to the allocated applet database ID
-    const dbId = config.firestoreDatabaseId || "ai-studio-supercoding-90a28953-19d3-40a0-908e-f7b84ded0118";
-    firestoreDb = getFirestore(firebaseApp, dbId);
-    console.log("Firebase initialized successfully on Express server with DB ID:", dbId);
+    // Use custom databaseId from config if provided, fallback to default database
+    const dbId = config.firestoreDatabaseId;
+    firestoreDb = dbId ? getFirestore(firebaseApp, dbId) : getFirestore(firebaseApp);
+    console.log("Firebase initialized successfully on Express server with DB ID:", dbId || "(default)");
   } catch (e) {
     console.error("Failed to initialize Firebase on Express server:", e);
   }

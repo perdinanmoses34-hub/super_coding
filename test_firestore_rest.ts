@@ -12,7 +12,7 @@ async function runTest() {
   console.log("ProjectId:", projectId);
 
   // Test 1: Named database ID
-  const customDbId = "ai-studio-supercoding-90a28953-19d3-40a0-908e-f7b84ded0118";
+  const customDbId = config.firestoreDatabaseId || "ai-studio-supercoding-05cba2b8-9e7c-4257-bfb6-5f3525816084";
   const url1 = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/${customDbId}/documents/church_db`;
   console.log(`\n--- Test 1 REST API: named DB (${customDbId}) ---`);
   try {

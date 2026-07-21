@@ -1649,6 +1649,38 @@ export default function AdminModules({
                         </div>
                       </div>
                     )}
+
+                    {/* Google Cloud Console Test User / OAuth Consent Screen Guide */}
+                    <div className="mt-4 p-4 text-left border border-indigo-100 bg-indigo-50/30 rounded-2xl space-y-3">
+                      <div className="flex items-start gap-2 text-indigo-950">
+                        <AlertCircle className="w-4.5 h-4.5 shrink-0 mt-0.5 text-indigo-600" />
+                        <div>
+                          <p className="font-bold uppercase tracking-wider text-[10px] text-indigo-950">
+                            PENTING: Solusi "Access Blocked / Error 403: access_denied"
+                          </p>
+                          <p className="mt-1 leading-relaxed text-[11px] text-indigo-800 font-sans">
+                            Karena proyek Google Cloud/Firebase ini baru dan berstatus <strong>Testing (Uji Coba)</strong>, Anda harus mendaftarkan alamat email Anda ke daftar <strong>Test Users (Pengguna Penguji)</strong> agar diizinkan masuk oleh Google.
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="p-3 bg-white rounded-xl border border-indigo-100/50 space-y-2">
+                        <p className="font-bold text-[10px] text-indigo-950 uppercase tracking-wider">
+                          Langkah Mudah Mendaftarkan Email Anda:
+                        </p>
+                        <ol className="list-decimal list-inside space-y-1.5 text-[11px] text-indigo-800 font-sans leading-relaxed">
+                          <li>Buka halaman <a href={`https://console.cloud.google.com/apis/credentials/consent?project=${firebaseConfig.projectId}`} target="_blank" rel="noreferrer" className="text-indigo-600 underline font-semibold hover:text-indigo-700">Google Cloud Console - OAuth Consent Screen</a>.</li>
+                          <li>Pastikan Anda login menggunakan akun Google pemilik proyek ini.</li>
+                          <li>Gulir ke bawah ke bagian <strong>Test users</strong> (Pengguna penguji), lalu klik tombol <strong>+ ADD USERS</strong>.</li>
+                          <li>Masukkan email Anda: <strong className="text-indigo-700 select-all font-mono">perdinan.moses34@guru.smp.belajar.id</strong> (atau email lain yang ingin Anda gunakan).</li>
+                          <li>Klik tombol <strong>SAVE</strong> untuk menyimpan.</li>
+                        </ol>
+                      </div>
+                      
+                      <p className="text-[10px] text-indigo-700 mt-1 font-sans">
+                        Setelah email berhasil ditambahkan di Cloud Console, silakan coba klik kembali tombol <strong>Hubungkan Google Drive Saya</strong> di atas untuk sinkronisasi database gereja secara langsung.
+                      </p>
+                    </div>
                   </div>
                 ) : (
                   <div className="space-y-4">
