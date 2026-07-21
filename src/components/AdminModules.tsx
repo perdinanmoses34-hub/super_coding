@@ -486,7 +486,18 @@ export default function AdminModules({
   const [customMenus, setCustomMenus] = useState<any[]>(() => {
     try {
       const stored = localStorage.getItem('church_custom_menus');
-      if (stored) return JSON.parse(stored);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) {
+          return parsed.map((item: any) => {
+            if (item.id === 'admin_settings' || item.id === 'admin_dashboard') {
+              return { ...item, visible: true };
+            }
+            return item;
+          });
+        }
+        return parsed;
+      }
     } catch (e) {
       console.error(e);
     }
@@ -1512,23 +1523,32 @@ export default function AdminModules({
                 <p className="text-[10px] text-slate-500">Atur visibilitas dan label khusus untuk seluruh menu navigasi admin di Sidebar. Perubahan akan langsung berdampak pada seluruh pengguna admin secara real-time.</p>
                 
                 <div className="space-y-3">
-                  {customMenus.map((menu, idx) => (
-                    <div key={menu.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 bg-white border border-slate-150 rounded-xl">
-                      <div className="flex items-center gap-2.5">
-                        <input
-                          type="checkbox"
-                          checked={menu.visible !== false}
-                          onChange={(e) => {
-                            const updated = [...customMenus];
-                            updated[idx] = { ...menu, visible: e.target.checked };
-                            setCustomMenus(updated);
-                          }}
-                          className="w-4 h-4 text-brand focus:ring-brand border-slate-300 rounded cursor-pointer"
-                        />
-                        <span className="text-xs font-bold text-slate-700 font-mono text-[10px] uppercase">
-                          {menu.id.replace('admin_', '').replace('_', ' ')}
-                        </span>
-                      </div>
+                  {customMenus.map((menu, idx) => {
+                    const isRequired = menu.id === 'admin_settings' || menu.id === 'admin_dashboard';
+                    return (
+                      <div key={menu.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 bg-white border border-slate-150 rounded-xl">
+                        <div className="flex items-center gap-2.5">
+                          <input
+                            type="checkbox"
+                            checked={isRequired ? true : (menu.visible !== false)}
+                            disabled={isRequired}
+                            onChange={(e) => {
+                              if (isRequired) return;
+                              const updated = [...customMenus];
+                              updated[idx] = { ...menu, visible: e.target.checked };
+                              setCustomMenus(updated);
+                            }}
+                            className={`w-4 h-4 text-brand focus:ring-brand border-slate-300 rounded cursor-pointer ${isRequired ? 'opacity-50 cursor-not-allowed' : ''}`}
+                          />
+                          <span className="text-xs font-bold text-slate-700 font-mono text-[10px] uppercase">
+                            {menu.id.replace('admin_', '').replace('_', ' ')}
+                          </span>
+                          {isRequired && (
+                            <span className="text-[9px] bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-full font-extrabold uppercase tracking-wider">
+                              Wajib Aktif
+                            </span>
+                          )}
+                        </div>
                       
                       <div className="flex-1 max-w-xs flex items-center gap-2">
                         <span className="text-[10px] text-slate-400">Nama Tampilan:</span>
@@ -1544,7 +1564,8 @@ export default function AdminModules({
                         />
                       </div>
                     </div>
-                  ))}
+                  );
+                })}
                 </div>
               </div>
 

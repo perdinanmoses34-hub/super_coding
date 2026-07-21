@@ -81,7 +81,16 @@ export default function Sidebar({
     try {
       const stored = localStorage.getItem('church_custom_menus');
       if (stored) {
-        return JSON.parse(stored);
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) {
+          return parsed.map((item: any) => {
+            if (item.id === 'admin_settings' || item.id === 'admin_dashboard') {
+              return { ...item, visible: true };
+            }
+            return item;
+          });
+        }
+        return parsed;
       }
     } catch (e) {
       console.error(e);
@@ -117,7 +126,17 @@ export default function Sidebar({
       try {
         const stored = localStorage.getItem('church_custom_menus');
         if (stored) {
-          setCustomMenus(JSON.parse(stored));
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed)) {
+            setCustomMenus(parsed.map((item: any) => {
+              if (item.id === 'admin_settings' || item.id === 'admin_dashboard') {
+                return { ...item, visible: true };
+              }
+              return item;
+            }));
+          } else {
+            setCustomMenus(parsed);
+          }
         }
       } catch (e) {
         console.error(e);
