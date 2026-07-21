@@ -108,7 +108,7 @@ export default function AdminModules({
 
   // Google Sheets Sync state
   const [sheetUrl, setSheetUrl] = useState(() => {
-    return localStorage.getItem('church_sync_sheet_url') || '';
+    return localStorage.getItem('church_sync_sheet_url') || 'https://docs.google.com/spreadsheets/d/1ejgcYFq4JZCyyLeSu3RgBWlj6kcw2h1dRmV17yt43Ck/edit';
   });
   const [isSyncingSheet, setIsSyncingSheet] = useState(false);
   const [sheetSyncLogs, setSheetSyncLogs] = useState<string[]>([]);
@@ -1797,7 +1797,7 @@ export default function AdminModules({
                   <input
                     type="url"
                     required
-                    placeholder="https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMd.../edit"
+                    placeholder="https://docs.google.com/spreadsheets/d/1ejgcYFq4JZCyyLeSu3RgBWlj6kcw2h1dRmV17yt43Ck/edit"
                     value={sheetUrl}
                     onChange={(e) => setSheetUrl(e.target.value)}
                     className="w-full p-3 border border-emerald-200 focus:border-emerald-500 rounded-xl text-xs bg-white focus:ring-4 focus:ring-emerald-100/50 font-mono outline-none transition-all"
