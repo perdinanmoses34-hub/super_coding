@@ -383,6 +383,80 @@ export default function App() {
                         MASUK KE DASHBOARD
                       </button>
                     </form>
+
+                    {/* Interactive Credentials Helper Panel */}
+                    <div className="mt-6 border-t border-slate-800/60 pt-5">
+                      <button
+                        type="button"
+                        onClick={() => setShowDemoCredentials(!showDemoCredentials)}
+                        className="w-full flex items-center justify-between text-[10px] font-black uppercase text-indigo-400 hover:text-indigo-300 transition-colors tracking-wider cursor-pointer"
+                      >
+                        <span>LIHAT AKUN DEMO / TEST</span>
+                        <span className="text-xs">{showDemoCredentials ? '▲' : '▼'}</span>
+                      </button>
+                      
+                      {showDemoCredentials && (
+                        <div className="mt-3 p-3 bg-slate-950/60 border border-slate-850 rounded-xl space-y-2.5 text-[11px] animate-fadeIn">
+                          <div className="flex justify-between items-center bg-slate-900/40 p-2 rounded-lg border border-slate-800/40">
+                            <div>
+                              <p className="font-extrabold text-indigo-400 text-[10px] uppercase tracking-wider">SUPER ADMIN</p>
+                              <p className="text-slate-300 font-mono text-[10px]">superadmin@church.com</p>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setLoginEmail('superadmin@church.com');
+                                setLoginPassword('church123');
+                                setSelectedRoleGroup('PELAYAN');
+                              }}
+                              className="px-2.5 py-1 bg-indigo-600/10 hover:bg-indigo-600 text-indigo-400 hover:text-white rounded-md font-bold text-[9px] uppercase tracking-wider transition-colors cursor-pointer border border-indigo-500/20"
+                            >
+                              GUNAKAN
+                            </button>
+                          </div>
+                          
+                          <div className="flex justify-between items-center bg-slate-900/40 p-2 rounded-lg border border-slate-800/40">
+                            <div>
+                              <p className="font-extrabold text-purple-400 text-[10px] uppercase tracking-wider">ADMIN STAFF</p>
+                              <p className="text-slate-300 font-mono text-[10px]">admin@church.com</p>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setLoginEmail('admin@church.com');
+                                setLoginPassword('church123');
+                                setSelectedRoleGroup('PELAYAN');
+                              }}
+                              className="px-2.5 py-1 bg-purple-600/10 hover:bg-purple-600 text-purple-400 hover:text-white rounded-md font-bold text-[9px] uppercase tracking-wider transition-colors cursor-pointer border border-purple-500/20"
+                            >
+                              GUNAKAN
+                            </button>
+                          </div>
+
+                          <div className="flex justify-between items-center bg-slate-900/40 p-2 rounded-lg border border-slate-800/40">
+                            <div>
+                              <p className="font-extrabold text-emerald-400 text-[10px] uppercase tracking-wider">JEMAAT / MEMBER</p>
+                              <p className="text-slate-300 font-mono text-[10px]">jemaat@church.com</p>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setLoginEmail('jemaat@church.com');
+                                setLoginPassword('church123');
+                                setSelectedRoleGroup('JEMAAT');
+                              }}
+                              className="px-2.5 py-1 bg-emerald-600/10 hover:bg-emerald-600 text-emerald-400 hover:text-white rounded-md font-bold text-[9px] uppercase tracking-wider transition-colors cursor-pointer border border-emerald-500/20"
+                            >
+                              GUNAKAN
+                            </button>
+                          </div>
+
+                          <p className="text-[9px] text-amber-500 font-extrabold tracking-wide text-center leading-relaxed">
+                            * SANDI BAWAAN SEMUA AKUN: <span className="font-mono bg-amber-500/10 px-1.5 py-0.5 rounded text-amber-400 text-[10px] select-all font-black">church123</span>
+                          </p>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
 
