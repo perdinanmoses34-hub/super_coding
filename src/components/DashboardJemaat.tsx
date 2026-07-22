@@ -572,7 +572,7 @@ export default function DashboardJemaat({
                 Sistem Informasi Gereja (CMS)
               </span>
               <h2 className="font-display font-black text-2xl md:text-4xl tracking-tight uppercase text-white drop-shadow-md">
-                Selamat Datang di GBI Rock Juanda
+                Selamat Datang di {settings.churchName || 'SYSTEM MANAGEMENT CHURCH (CMS)'}
               </h2>
               <p className="text-xs md:text-sm text-slate-100/90 leading-relaxed max-w-2xl font-medium">
                 Membangun jemaat yang bertumbuh, melayani dengan kasih, dan memuliakan nama Tuhan Yesus Kristus. Temukan informasi jadwal ibadah, warta jemaat, permohonan doa syafaat, serta salurkan persembahan kasih Anda melalui menu donasi.
@@ -766,7 +766,7 @@ export default function DashboardJemaat({
                 </h3>
                 <p className="text-xs font-bold text-slate-800 mt-1 flex items-center gap-1.5">
                   <MapPin className="w-3.5 h-3.5 text-[#0F172A]" />
-                  Chapel Lt. 2 GBI Rock Juanda
+                  Chapel / Gedung Utama - {settings.churchName || 'SYSTEM MANAGEMENT CHURCH (CMS)'}
                 </p>
                 
                 {/* Custom Info Box */}
@@ -846,7 +846,7 @@ export default function DashboardJemaat({
                     </div>
                     <div>
                       <span className="text-[9px] font-bold text-gray-400 uppercase">Atas Nama Rekening</span>
-                      <p className="text-xs font-extrabold text-slate-800 dark:text-slate-200">{settings.bankAccountName || 'GBI ROCK JUANDA'}</p>
+                      <p className="text-xs font-extrabold text-slate-800 dark:text-slate-200">{settings.bankAccountName || 'SYSTEM MANAGEMENT CHURCH (CMS)'}</p>
                     </div>
                   </div>
                 </div>

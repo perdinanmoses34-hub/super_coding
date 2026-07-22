@@ -696,7 +696,7 @@ export default function App() {
         )}
       </AnimatePresence>
       {/* PWA Animated Loading Splash Screen & Professional Installation Prompt */}
-      <PwaInstallAndSplash churchName={settings.churchName} logoUrl={settings.churchLogoUrl} />
+      <PwaInstallAndSplash churchName={settings.churchName} logoUrl={settings.logoUrl} />
     </div>
   );
 }

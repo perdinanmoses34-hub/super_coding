@@ -147,7 +147,7 @@ export default function DashboardAdmin({ setTab, currentUser, settings }: Dashbo
         <div className="relative z-10 w-full flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <span className="bg-white/15 border border-white/25 px-3 py-1.5 rounded-full text-[10px] font-extrabold uppercase tracking-widest text-white backdrop-blur-md">
-              Portal Admin {settings.churchName || 'CMS Juanda'}
+              Portal Admin {settings.churchName || 'SYSTEM MANAGEMENT CHURCH (CMS)'}
             </span>
             <h2 className="font-display font-black text-2xl md:text-3xl mt-2.5 tracking-tight text-white drop-shadow-sm">
               {settings.adminWelcomeText || `Selamat Datang, ${currentUser.name}!`}
