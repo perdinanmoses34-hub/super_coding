@@ -102,15 +102,16 @@ export default function DashboardAdmin({ setTab, currentUser, settings }: Dashbo
     };
   }, []);
 
-  // Custom Chart Data: Member growth (Jan - Jul)
+  // Custom Chart Data: Member growth dynamically scaled to stats.members
+  const currentCount = stats.members;
   const growthData = [
-    { month: 'Jan', count: 120 },
-    { month: 'Feb', count: 145 },
-    { month: 'Mar', count: 180 },
-    { month: 'Apr', count: 210 },
-    { month: 'May', count: 240 },
-    { month: 'Jun', count: 285 },
-    { month: 'Jul', count: 312 },
+    { month: 'Jan', count: Math.max(1, Math.floor(currentCount * 0.3)) },
+    { month: 'Feb', count: Math.max(1, Math.floor(currentCount * 0.45)) },
+    { month: 'Mar', count: Math.max(1, Math.floor(currentCount * 0.6)) },
+    { month: 'Apr', count: Math.max(1, Math.floor(currentCount * 0.75)) },
+    { month: 'May', count: Math.max(1, Math.floor(currentCount * 0.85)) },
+    { month: 'Jun', count: Math.max(1, Math.floor(currentCount * 0.95)) },
+    { month: 'Jul', count: currentCount },
   ];
 
   // Custom Chart Data: Activity (Sun, Mon, Tue, etc.)
@@ -176,9 +177,9 @@ export default function DashboardAdmin({ setTab, currentUser, settings }: Dashbo
               <Users className="w-4 h-4" />
             </div>
           </div>
-          <p className="text-4xl font-black text-white mt-2">{stats.members * 15 + 130}</p>
+          <p className="text-4xl font-black text-white mt-2">{stats.members}</p>
           <span className="bg-blue-500/15 text-blue-400 text-[10px] px-3 py-1 rounded-full font-black w-fit uppercase border border-blue-500/20 mt-3">
-            +12.5% Jiwa Aktif
+            {stats.members} Jiwa Terdaftar
           </span>
         </div>
 

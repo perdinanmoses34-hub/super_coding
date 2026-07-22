@@ -544,7 +544,7 @@ export default function DashboardJemaat({
                   <Users className="w-4 h-4" />
                 </div>
               </div>
-              <p className="text-4xl font-black text-white mt-2">{congregations.length * 15 + 130}</p>
+              <p className="text-4xl font-black text-white mt-2">{congregations.length}</p>
               <span className="bg-blue-500/15 text-blue-400 text-[10px] px-3 py-1 rounded-full font-black w-fit uppercase border border-blue-500/20 mt-3">
                 Jiwa Terdaftar
               </span>
@@ -553,14 +553,14 @@ export default function DashboardJemaat({
             {/* Acara Hari Ini Card */}
             <div className="bg-[#0F172A]/90 border border-slate-800/80 p-5 rounded-3xl relative overflow-hidden flex flex-col justify-between min-h-[140px] group hover:scale-[1.02] transition-all shadow-lg">
               <div className="flex items-center justify-between">
-                <p className="text-slate-400 font-extrabold text-[10px] uppercase tracking-widest">Acara Hari Ini</p>
+                <p className="text-slate-400 font-extrabold text-[10px] uppercase tracking-widest">Jadwal Event</p>
                 <div className="p-2 bg-yellow-500/10 text-yellow-500 rounded-xl border border-yellow-500/20">
                   <Calendar className="w-4 h-4" />
                 </div>
               </div>
-              <p className="text-4xl font-black text-yellow-500 mt-2">0</p>
+              <p className="text-4xl font-black text-yellow-500 mt-2">{events.length}</p>
               <span className="bg-yellow-500/15 text-yellow-400 text-[10px] px-3 py-1 rounded-full font-black w-fit uppercase border border-yellow-500/20 mt-3">
-                Jadwal Ibadah
+                Jadwal Ibadah & Event
               </span>
             </div>
 
@@ -572,9 +572,9 @@ export default function DashboardJemaat({
                   <Heart className="w-4 h-4" />
                 </div>
               </div>
-              <p className="text-4xl font-black text-rose-500 mt-2">1</p>
+              <p className="text-4xl font-black text-rose-500 mt-2">{prayers.length}</p>
               <span className="bg-rose-500/15 text-rose-400 text-[10px] px-3 py-1 rounded-full font-black w-fit uppercase border border-rose-500/20 mt-3">
-                Butuh Dukungan
+                Permohonan Doa
               </span>
             </div>
 
