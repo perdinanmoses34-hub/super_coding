@@ -22,6 +22,7 @@ import {
   ChurchSettings,
 } from '../types';
 import { findDatabaseFile, downloadDatabaseFile, uploadDatabaseFile } from '../lib/googleDriveSync';
+import { saveToFirestoreClient, loadFromFirestoreClient, subscribeFirestoreRealtime } from '../lib/firebaseClient';
 
 // Default Church Settings
 const DEFAULT_SETTINGS: ChurchSettings = {
@@ -527,20 +528,37 @@ export class MockDatabase {
   private static isSavePending = false;
   private static onSyncCallback: (() => void) | null = null;
 
+  private static isRealtimeInitialized = false;
+
   static registerSyncCallback(callback: () => void) {
     this.onSyncCallback = callback;
+    this.initRealtimeListener();
+  }
+
+  static initRealtimeListener() {
+    if (this.isRealtimeInitialized) return;
+    this.isRealtimeInitialized = true;
+    subscribeFirestoreRealtime(() => {
+      if (this.onSyncCallback) {
+        this.onSyncCallback();
+      }
+    });
   }
 
   static async loadFromServer() {
+    this.initRealtimeListener();
+
+    // 1. Try Express API backend if available
     try {
       const res = await fetch(`/api/db?t=${Date.now()}`);
-      const json = await res.json();
-      if (json.success) {
-        if (json.data) {
-          // Server has data, load it into localStorage
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success && json.data) {
           const dbData = json.data;
           Object.keys(dbData).forEach((key) => {
-            localStorage.setItem(`church_cms_${key}`, JSON.stringify(dbData[key]));
+            if (dbData[key] !== undefined) {
+              localStorage.setItem(`church_cms_${key}`, JSON.stringify(dbData[key]));
+            }
           });
           if (this.onSyncCallback) {
             this.onSyncCallback();
@@ -549,15 +567,28 @@ export class MockDatabase {
             window.dispatchEvent(new Event('church_db_updated'));
           }
           return true;
-        } else {
-          // Server doesn't have data yet (first run), let's seed the server with our current localStorage
-          await this.saveToServer();
-          return true;
         }
       }
     } catch (e) {
-      console.warn("Failed to sync from server, using local data", e);
+      // Ignore Express fetch error, fallback to Firestore
     }
+
+    // 2. Direct client-side Firestore load (Works on GitHub Pages & mobile devices directly!)
+    try {
+      const firestoreData = await loadFromFirestoreClient();
+      if (firestoreData && Object.keys(firestoreData).length > 0) {
+        if (this.onSyncCallback) {
+          this.onSyncCallback();
+        }
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new Event('church_db_updated'));
+        }
+        return true;
+      }
+    } catch (e) {
+      console.warn("Client Firestore sync failed:", e);
+    }
+
     return false;
   }
 
@@ -586,13 +617,22 @@ export class MockDatabase {
           prayer_requests: this.getPrayerRequests(),
           activity_logs: this.getLogs(),
         };
-        await fetch("/api/db", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(fullBackup),
-        });
+
+        // 1. Try Express server API
+        try {
+          await fetch("/api/db", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(fullBackup),
+          });
+        } catch (e) {
+          // Ignore Express error, fallback to client Firestore
+        }
+
+        // 2. Save directly to Firestore Cloud Database (Syncs to all devices globally!)
+        await saveToFirestoreClient(fullBackup);
       } catch (e) {
-        console.warn("Failed to save database to server", e);
+        console.warn("Failed to save database to server/cloud", e);
       } finally {
         this.isSyncing = false;
       }
