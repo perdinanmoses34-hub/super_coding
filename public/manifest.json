@@ -1,6 +1,6 @@
 {
   "short_name": "ChurchCMS",
-  "name": "Church Management System CMS",
+  "name": "Aplikasi CMS Gereja Indonesia",
   "icons": [
     {
       "src": "https://images.unsplash.com/photo-1548625361-155de0cbb10a?w=192&auto=format&fit=crop&q=80",
@@ -16,9 +16,10 @@
     }
   ],
   "start_url": "./",
-  "background_color": "#0f766e",
-  "theme_color": "#0f766e",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
   "display": "standalone",
+  "display_override": ["standalone", "fullscreen", "minimal-ui"],
   "orientation": "portrait",
   "shortcuts": [
     {

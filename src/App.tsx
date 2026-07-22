@@ -41,6 +41,7 @@ import DashboardAdmin from './components/DashboardAdmin';
 import DashboardJemaat from './components/DashboardJemaat';
 import AdminModules from './components/AdminModules';
 import InstallPrompt from './components/InstallPrompt';
+import PwaInstallAndSplash from './components/PwaInstallAndSplash';
 import { motion, AnimatePresence } from 'motion/react';
 
 export default function App() {
@@ -694,6 +695,8 @@ export default function App() {
           </div>
         )}
       </AnimatePresence>
+      {/* PWA Animated Loading Splash Screen & Professional Installation Prompt */}
+      <PwaInstallAndSplash churchName={settings.churchName} logoUrl={settings.churchLogoUrl} />
     </div>
   );
 }

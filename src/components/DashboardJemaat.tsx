@@ -53,6 +53,7 @@ import {
   ChurchSettings,
   Role,
   User as UserType,
+  Notification as ChurchNotificationType,
 } from '../types';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -139,6 +140,8 @@ export default function DashboardJemaat({
   const [prayers, setPrayers] = useState<PrayerRequest[]>([]);
   const [registrations, setRegistrations] = useState<EventRegistration[]>([]);
   const [congregations, setCongregations] = useState<any[]>([]);
+  const [notifications, setNotifications] = useState<ChurchNotificationType[]>([]);
+  const [activePopupNotif, setActivePopupNotif] = useState<ChurchNotificationType | null>(null);
 
   // Beautiful Custom Toast system (replaces blocked alert dialogs inside the preview iframe)
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'info' | 'error' } | null>(null);
@@ -333,6 +336,49 @@ export default function DashboardJemaat({
     setPrayers(MockDatabase.getPrayerRequests());
     setRegistrations(MockDatabase.getEventRegistrations());
     setCongregations(MockDatabase.getCongregations());
+
+    const allNotifs = MockDatabase.getNotifications();
+    const jemaatNotifs = allNotifs.filter(
+      (n) => n.targetGroup === 'all' || n.targetGroup === 'jemaat'
+    );
+    setNotifications(jemaatNotifs);
+
+    // Check if new notification arrived
+    if (jemaatNotifs.length > 0) {
+      const latest = jemaatNotifs[0];
+      const lastSeenId = localStorage.getItem('last_seen_notif_id');
+
+      if (latest.id !== lastSeenId) {
+        localStorage.setItem('last_seen_notif_id', latest.id);
+
+        // A. If app is active in foreground -> show floating card in dashboard
+        setActivePopupNotif(latest);
+
+        // B. Always attempt to trigger native status bar notification for mobile devices
+        if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
+          try {
+            if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+              navigator.serviceWorker.ready.then((reg) => {
+                reg.showNotification(latest.title, {
+                  body: latest.content,
+                  icon: 'https://images.unsplash.com/photo-1548625361-155de0cbb10a?w=192&auto=format&fit=crop&q=80',
+                  badge: 'https://images.unsplash.com/photo-1548625361-155de0cbb10a?w=96&auto=format&fit=crop&q=80',
+                  vibrate: [200, 100, 200],
+                  tag: latest.id,
+                } as any);
+              });
+            } else {
+              new Notification(latest.title, {
+                body: latest.content,
+                icon: 'https://images.unsplash.com/photo-1548625361-155de0cbb10a?w=192&auto=format&fit=crop&q=80',
+              });
+            }
+          } catch (err) {
+            console.warn('Native notification trigger error:', err);
+          }
+        }
+      }
+    }
   };
 
   // Event registration logic
@@ -592,6 +638,74 @@ export default function DashboardJemaat({
               </span>
             </div>
           </div>
+
+          {/* NOTIFIKASI PEMBERITAHUAN CARD SECTION */}
+          {notifications.length > 0 && (
+            <div className="bg-gradient-to-r from-slate-900 via-amber-950/40 to-slate-900 border border-amber-500/30 p-6 rounded-3xl space-y-4 shadow-xl relative overflow-hidden">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <div className="p-2 bg-amber-500/20 text-amber-400 rounded-xl border border-amber-500/30">
+                    <Bell className="w-5 h-5 animate-bounce" />
+                  </div>
+                  <div>
+                    <h3 className="font-display font-black text-sm uppercase tracking-wider text-amber-300">
+                      Pemberitahuan & Notifikasi Resmi
+                    </h3>
+                    <p className="text-[11px] text-slate-400">
+                      Pemberitahuan langsung dari pengurus gereja
+                    </p>
+                  </div>
+                </div>
+
+                {typeof window !== 'undefined' && 'Notification' in window && Notification.permission !== 'granted' && (
+                  <button
+                    onClick={() => {
+                      Notification.requestPermission().then((perm) => {
+                        if (perm === 'granted') {
+                          showToast('✓ Notifikasi Bar HP Berhasil Diaktifkan!', 'success');
+                        }
+                      });
+                    }}
+                    className="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-[10px] rounded-xl transition-all cursor-pointer shadow-md flex items-center gap-1"
+                  >
+                    <span>🔔 Aktifkan Bar HP</span>
+                  </button>
+                )}
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {notifications.slice(0, 4).map((notif) => (
+                  <div
+                    key={notif.id}
+                    className="bg-slate-950/80 border border-slate-800/90 hover:border-amber-500/50 p-4 rounded-2xl space-y-2 transition-all shadow-md group"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="bg-amber-500/20 text-amber-300 text-[9px] font-extrabold px-2 py-0.5 rounded-full border border-amber-500/30 uppercase tracking-wide">
+                        {notif.targetGroup === 'all' ? 'Semua Jemaat' : 'Khusus Jemaat'}
+                      </span>
+                      <span className="text-[10px] text-slate-400 font-mono">
+                        {new Date(notif.sentDate).toLocaleDateString('id-ID', {
+                          day: 'numeric',
+                          month: 'short',
+                          year: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </span>
+                    </div>
+
+                    <h4 className="font-extrabold text-white text-sm group-hover:text-amber-300 transition-colors">
+                      {notif.title}
+                    </h4>
+
+                    <p className="text-xs text-slate-300 leading-relaxed bg-slate-900/60 p-3 rounded-xl border border-slate-800">
+                      {notif.content}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Split Section (Warta & Upcoming Event Card) */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -2040,6 +2154,74 @@ export default function DashboardJemaat({
             </motion.div>
           </div>
         )}
+
+        {/* Active Notification Popup Card overlay for in-app alert */}
+        <AnimatePresence>
+          {activePopupNotif && (
+            <div className="fixed top-4 left-4 right-4 md:left-auto md:right-6 md:w-96 z-[95] pointer-events-auto">
+              <motion.div
+                initial={{ y: -50, opacity: 0, scale: 0.9 }}
+                animate={{ y: 0, opacity: 1, scale: 1 }}
+                exit={{ y: -50, opacity: 0, scale: 0.9 }}
+                className="bg-gradient-to-r from-amber-500 via-amber-600 to-teal-700 text-white p-4 rounded-3xl shadow-2xl border border-amber-300/40 relative overflow-hidden"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2.5 bg-black/20 rounded-2xl border border-white/20 text-xl">
+                      🔔
+                    </div>
+                    <div>
+                      <span className="text-[9px] font-black uppercase tracking-wider text-amber-200 bg-black/20 px-2 py-0.5 rounded-full">
+                        Pemberitahuan Baru
+                      </span>
+                      <h4 className="font-extrabold text-sm text-white mt-1 leading-tight">
+                        {activePopupNotif.title}
+                      </h4>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setActivePopupNotif(null)}
+                    className="p-1 hover:bg-black/20 rounded-full text-white/80 hover:text-white transition-colors cursor-pointer"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+
+                <p className="text-xs text-amber-50 font-medium mt-2 leading-relaxed bg-black/20 p-3 rounded-2xl border border-white/10">
+                  {activePopupNotif.content}
+                </p>
+
+                <div className="mt-3 flex items-center justify-between">
+                  <span className="text-[10px] text-amber-200 font-mono">
+                    {new Date(activePopupNotif.sentDate).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}
+                  </span>
+                  <div className="flex items-center gap-2">
+                    {typeof window !== 'undefined' && 'Notification' in window && Notification.permission !== 'granted' && (
+                      <button
+                        onClick={() => {
+                          Notification.requestPermission().then((perm) => {
+                            if (perm === 'granted') {
+                              showToast('✓ Notifikasi Bar HP Berhasil Diaktifkan!', 'success');
+                            }
+                          });
+                        }}
+                        className="text-[10px] bg-white text-slate-900 px-3 py-1.5 rounded-xl font-bold hover:bg-amber-100 transition-all cursor-pointer"
+                      >
+                        🔔 Aktifkan Bar HP
+                      </button>
+                    )}
+                    <button
+                      onClick={() => setActivePopupNotif(null)}
+                      className="text-[10px] bg-black/30 text-white px-3 py-1.5 rounded-xl font-bold hover:bg-black/50 transition-all cursor-pointer"
+                    >
+                      Tutup
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
 
         {/* Custom Toast Notification */}
         {toast && (
