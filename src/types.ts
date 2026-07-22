@@ -215,4 +215,5 @@ export interface ChurchSettings {
   adminWelcomeText?: string;
   adminSubText?: string;
   googleSheetUrl?: string;
+  customMenus?: Array<{ id: string; label: string; visible: boolean }>;
 }

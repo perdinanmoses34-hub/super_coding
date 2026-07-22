@@ -1003,6 +1003,18 @@ export class MockDatabase {
     );
   }
 
+  static resetSettings(actor: { id: string; name: string; role: Role }): ChurchSettings {
+    const before = this.getSettings();
+    this.setStored('settings', DEFAULT_SETTINGS);
+    this.addLog(
+      actor,
+      'RESET_SETTINGS',
+      JSON.stringify(before),
+      JSON.stringify(DEFAULT_SETTINGS)
+    );
+    return DEFAULT_SETTINGS;
+  }
+
   static getUsers(): User[] {
     const stored = this.getStored<User[]>('users', DEFAULT_USERS);
     let changed = false;

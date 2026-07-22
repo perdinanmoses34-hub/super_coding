@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   FileText,
   Megaphone,
@@ -30,6 +30,8 @@ import {
   Eye,
   QrCode,
   CheckCircle2,
+  CheckCircle,
+  RotateCcw,
   Smartphone,
 } from 'lucide-react';
 import { MockDatabase } from '../db/mockDb';
@@ -577,8 +579,73 @@ export default function AdminModules({
     MockDatabase.saveSettings(updated, currentUser);
     localStorage.setItem('church_custom_menus', JSON.stringify(customMenus));
     window.dispatchEvent(new Event('church_menus_updated'));
+    window.dispatchEvent(new Event('church_db_updated'));
     onSettingsSaved(updated);
     alert('Pengaturan gereja & konfigurasi aplikasi berhasil disimpan!');
+  };
+
+  const handleResetSettings = () => {
+    if (window.confirm("Apakah Anda yakin ingin mengembalikan seluruh Pengaturan Sistem ke konfigurasi awal (default)?")) {
+      const res = MockDatabase.resetSettings(currentUser);
+      setChurchName(res.churchName || '');
+      setLogoUrl(res.logoUrl || '');
+      setBannerUrl(res.bannerUrl || '');
+      setAddress(res.address || '');
+      setPhone(res.phone || '');
+      setEmail(res.email || '');
+      setPrimaryColor(res.primaryColor || '#1e3a8a');
+      setMapsEmbedUrl(res.mapsEmbedUrl || '');
+      setWebsite(res.website || '');
+      setFooterText(res.footerText || '');
+      setSeoTitle(res.seoTitle || '');
+      setSeoDescription(res.seoDescription || '');
+      setFacebook(res.socialMedia?.facebook || '');
+      setInstagram(res.socialMedia?.instagram || '');
+      setYoutube(res.socialMedia?.youtube || '');
+      setTiktok(res.socialMedia?.tiktok || '');
+      setBankName(res.bankName || '');
+      setBankAccountNo(res.bankAccountNo || '');
+      setBankAccountName(res.bankAccountName || '');
+      setQrisUrl(res.qrisUrl || '');
+      setAdminWelcomeText(res.adminWelcomeText || '');
+      setAdminSubText(res.adminSubText || '');
+      onSettingsSaved(res);
+      window.dispatchEvent(new Event('church_db_updated'));
+      alert('Pengaturan sistem berhasil dikembalikan ke default!');
+    }
+  };
+
+  const handleResetMenus = () => {
+    if (window.confirm("Apakah Anda yakin ingin mengembalikan susunan menu sidebar ke default?")) {
+      localStorage.removeItem('church_custom_menus');
+      const defaultList = [
+        { id: 'admin_dashboard', label: 'Dashboard Admin', visible: true },
+        { id: 'admin_news', label: 'Kelola Berita', visible: true },
+        { id: 'admin_announcements', label: 'Kelola Pengumuman', visible: true },
+        { id: 'admin_devotions', label: 'Kelola Renungan', visible: true },
+        { id: 'admin_events', label: 'Kelola Event', visible: true },
+        { id: 'admin_congregation', label: 'Data Jemaat', visible: true },
+        { id: 'admin_users', label: 'Kelola Akun & Sandi', visible: true },
+        { id: 'admin_comments', label: 'Moderasi Komentar', visible: true },
+        { id: 'admin_notifications', label: 'Kirim Notifikasi', visible: true },
+        { id: 'admin_ministries', label: 'Kelola Pelayanan', visible: true },
+        { id: 'admin_organizations', label: 'Struktur Organisasi', visible: true },
+        { id: 'admin_gallery', label: 'Kelola Galeri', visible: true },
+        { id: 'admin_settings', label: 'Pengaturan Sistem', visible: true },
+        { id: 'jemaat_home', label: 'Beranda Jemaat', visible: true },
+        { id: 'jemaat_schedule', label: 'Jadwal Ibadah', visible: true },
+        { id: 'jemaat_devotions', label: 'Renungan Harian', visible: true },
+        { id: 'jemaat_events', label: 'Event Gereja', visible: true },
+        { id: 'jemaat_donasi', label: 'Kas/Donasi', visible: true },
+        { id: 'jemaat_ministries', label: 'Pelayanan Jemaat', visible: true },
+        { id: 'jemaat_organization', label: 'Struktur Pengurus', visible: true },
+        { id: 'jemaat_gallery', label: 'Galeri Media', visible: true },
+        { id: 'jemaat_profile', label: 'Profil Saya', visible: true },
+      ];
+      setCustomMenus(defaultList);
+      window.dispatchEvent(new Event('church_menus_updated'));
+      alert('Susunan menu berhasil dikembalikan ke default!');
+    }
   };
 
   const handleSyncGoogleSheet = async (e: React.FormEvent) => {
@@ -1600,7 +1667,7 @@ export default function AdminModules({
                     <input
                       type="text"
                       placeholder="https://domain.com/logo.png"
-                      value={logoUrl && logoUrl.startsWith('data:') ? '' : (logoUrl || '')}
+                      value={logoUrl || ''}
                       onChange={(e) => setLogoUrl(e.target.value)}
                       className="w-full p-2 border border-gray-200 rounded-xl text-[10px] bg-white focus:border-indigo-500 font-mono"
                     />
@@ -1724,11 +1791,18 @@ export default function AdminModules({
 
               {/* Kustomisasi Menu Sidebar Admin */}
               <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200/60 space-y-4">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                   <div className="flex items-center gap-2 text-slate-800">
                     <Settings className="w-5 h-5 text-indigo-600" />
                     <h4 className="font-display font-bold text-xs uppercase tracking-wide">Kustomisasi Menu Sidebar Admin & Navigasi</h4>
                   </div>
+                  <button
+                    type="button"
+                    onClick={handleResetMenus}
+                    className="text-[10px] text-amber-700 hover:text-amber-800 font-bold bg-amber-100/70 hover:bg-amber-100 px-3 py-1.5 rounded-lg border border-amber-200/60 transition-all cursor-pointer self-start sm:self-auto"
+                  >
+                    ↺ Reset Susunan Menu
+                  </button>
                 </div>
                 <p className="text-[10px] text-slate-500">Atur visibilitas, ubah nama tampilan, atau tambah/hapus menu kustom pada navigasi aplikasi.</p>
 
@@ -1814,7 +1888,18 @@ export default function AdminModules({
                 </div>
               </div>
 
-              <button type="submit" className="w-full py-2.5 bg-brand text-white font-bold text-xs rounded-xl shadow-md cursor-pointer">Simpan Konfigurasi Pengaturan</button>
+              <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                <button type="submit" className="flex-1 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-md transition-all active:scale-[0.99] cursor-pointer flex items-center justify-center gap-2">
+                  <CheckCircle className="w-4 h-4" /> Simpan Konfigurasi Pengaturan
+                </button>
+                <button
+                  type="button"
+                  onClick={handleResetSettings}
+                  className="px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl border border-slate-200 transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                >
+                  <RotateCcw className="w-3.5 h-3.5 text-slate-500" /> Reset Ke Default
+                </button>
+              </div>
             </form>
 
             {/* Google Drive Database Sync */}
