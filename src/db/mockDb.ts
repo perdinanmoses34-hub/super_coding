@@ -985,22 +985,11 @@ export class MockDatabase {
   }
 
   static getSettings(): ChurchSettings {
-    const settings = this.getStored('settings', DEFAULT_SETTINGS);
-    // Force migration if the name is old or bank details are missing
-    if (settings.churchName === 'CMS (SYSTEM MANAGEMENT CHURCH)' || !settings.bankName) {
-      const migrated = {
-        ...DEFAULT_SETTINGS,
-        ...settings,
-        churchName: settings.churchName === 'CMS (SYSTEM MANAGEMENT CHURCH)' ? 'GBI ROCK JUANDA' : settings.churchName,
-        bankName: settings.bankName || DEFAULT_SETTINGS.bankName,
-        bankAccountNo: settings.bankAccountNo || DEFAULT_SETTINGS.bankAccountNo,
-        bankAccountName: settings.bankAccountName || DEFAULT_SETTINGS.bankAccountName,
-        qrisUrl: settings.qrisUrl || DEFAULT_SETTINGS.qrisUrl,
-      };
-      this.setStored('settings', migrated);
-      return migrated;
-    }
-    return settings;
+    const settings = this.getStored<ChurchSettings>('settings', DEFAULT_SETTINGS);
+    return {
+      ...DEFAULT_SETTINGS,
+      ...settings,
+    };
   }
 
   static saveSettings(settings: ChurchSettings, actor: { id: string; name: string; role: Role }) {

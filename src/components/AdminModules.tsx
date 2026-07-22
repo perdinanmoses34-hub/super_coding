@@ -451,31 +451,48 @@ export default function AdminModules({
   };
 
   // SETTINGS SAVED
-  const [churchName, setChurchName] = useState(settings.churchName);
-  const [logoUrl, setLogoUrl] = useState(settings.logoUrl);
-  const [bannerUrl, setBannerUrl] = useState(settings.bannerUrl);
-  const [address, setAddress] = useState(settings.address);
-  const [phone, setPhone] = useState(settings.phone);
-  const [email, setEmail] = useState(settings.email);
-  const [primaryColor, setPrimaryColor] = useState(settings.primaryColor);
-  const [mapsEmbedUrl, setMapsEmbedUrl] = useState(settings.mapsEmbedUrl);
+  const [churchName, setChurchName] = useState(settings.churchName || '');
+  const [logoUrl, setLogoUrl] = useState(settings.logoUrl || '');
+  const [bannerUrl, setBannerUrl] = useState(settings.bannerUrl || '');
+  const [address, setAddress] = useState(settings.address || '');
+  const [phone, setPhone] = useState(settings.phone || '');
+  const [email, setEmail] = useState(settings.email || '');
+  const [primaryColor, setPrimaryColor] = useState(settings.primaryColor || '#1e3a8a');
+  const [mapsEmbedUrl, setMapsEmbedUrl] = useState(settings.mapsEmbedUrl || '');
+  const [website, setWebsite] = useState(settings.website || '');
+  const [footerText, setFooterText] = useState(settings.footerText || '');
+  const [seoTitle, setSeoTitle] = useState(settings.seoTitle || '');
+  const [seoDescription, setSeoDescription] = useState(settings.seoDescription || '');
+  const [facebook, setFacebook] = useState(settings.socialMedia?.facebook || '');
+  const [instagram, setInstagram] = useState(settings.socialMedia?.instagram || '');
+  const [youtube, setYoutube] = useState(settings.socialMedia?.youtube || '');
+  const [tiktok, setTiktok] = useState(settings.socialMedia?.tiktok || '');
   const [bankName, setBankName] = useState(settings.bankName || '');
   const [bankAccountNo, setBankAccountNo] = useState(settings.bankAccountNo || '');
   const [bankAccountName, setBankAccountName] = useState(settings.bankAccountName || '');
   const [qrisUrl, setQrisUrl] = useState(settings.qrisUrl || '');
   const [adminWelcomeText, setAdminWelcomeText] = useState(settings.adminWelcomeText || '');
   const [adminSubText, setAdminSubText] = useState(settings.adminSubText || '');
+  const [newMenuLabel, setNewMenuLabel] = useState('');
 
   // Keep state synced with props when settings are updated elsewhere
   useEffect(() => {
-    setChurchName(settings.churchName);
-    setLogoUrl(settings.logoUrl);
-    setBannerUrl(settings.bannerUrl);
-    setAddress(settings.address);
-    setPhone(settings.phone);
-    setEmail(settings.email);
-    setPrimaryColor(settings.primaryColor);
-    setMapsEmbedUrl(settings.mapsEmbedUrl);
+    setChurchName(settings.churchName || '');
+    setLogoUrl(settings.logoUrl || '');
+    setBannerUrl(settings.bannerUrl || '');
+    setAddress(settings.address || '');
+    setPhone(settings.phone || '');
+    setEmail(settings.email || '');
+    setPrimaryColor(settings.primaryColor || '#1e3a8a');
+    setMapsEmbedUrl(settings.mapsEmbedUrl || '');
+    setWebsite(settings.website || '');
+    setFooterText(settings.footerText || '');
+    setSeoTitle(settings.seoTitle || '');
+    setSeoDescription(settings.seoDescription || '');
+    setFacebook(settings.socialMedia?.facebook || '');
+    setInstagram(settings.socialMedia?.instagram || '');
+    setYoutube(settings.socialMedia?.youtube || '');
+    setTiktok(settings.socialMedia?.tiktok || '');
     setBankName(settings.bankName || '');
     setBankAccountNo(settings.bankAccountNo || '');
     setBankAccountName(settings.bankAccountName || '');
@@ -540,6 +557,16 @@ export default function AdminModules({
       email,
       primaryColor,
       mapsEmbedUrl,
+      website,
+      footerText,
+      seoTitle,
+      seoDescription,
+      socialMedia: {
+        facebook,
+        instagram,
+        youtube,
+        tiktok,
+      },
       bankName,
       bankAccountNo,
       bankAccountName,
@@ -1460,14 +1487,14 @@ export default function AdminModules({
               <form onSubmit={handleSaveSettings} className="space-y-6 max-w-2xl mx-auto">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase">Nama Gereja Resmi</label>
-                  <input type="text" required value={churchName} onChange={(e) => setChurchName(e.target.value)} className="w-full p-2.5 border border-gray-200 rounded-xl text-xs bg-white focus:border-brand" />
+                  <label className="block text-xs font-semibold text-gray-500 uppercase">Nama Organisasi / Gereja Resmi</label>
+                  <input type="text" value={churchName} onChange={(e) => setChurchName(e.target.value)} placeholder="Contoh: SYSTEM MANAGEMENT CHURCH (CMS)" className="w-full p-2.5 border border-gray-200 rounded-xl text-xs bg-white focus:border-brand font-bold text-slate-800" />
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-gray-500 uppercase">Konfigurasi Warna Tema (Hex)</label>
                   <div className="flex gap-2">
                     <input type="color" value={primaryColor} onChange={(e) => setPrimaryColor(e.target.value)} className="w-10 h-10 border border-gray-200 rounded-xl cursor-pointer" />
-                    <input type="text" required value={primaryColor} onChange={(e) => setPrimaryColor(e.target.value)} className="flex-1 p-2.5 border border-gray-200 rounded-xl text-xs bg-white focus:border-brand font-mono" />
+                    <input type="text" value={primaryColor} onChange={(e) => setPrimaryColor(e.target.value)} className="flex-1 p-2.5 border border-gray-200 rounded-xl text-xs bg-white focus:border-brand font-mono" />
                   </div>
                 </div>
               </div>
@@ -1572,7 +1599,7 @@ export default function AdminModules({
                     <label className="block text-[9px] font-semibold text-gray-400 uppercase mb-1">Atau masukkan Link/URL logo</label>
                     <input
                       type="text"
-                      placeholder="https://gkhk.or.id/logo.png"
+                      placeholder="https://domain.com/logo.png"
                       value={logoUrl && logoUrl.startsWith('data:') ? '' : (logoUrl || '')}
                       onChange={(e) => setLogoUrl(e.target.value)}
                       className="w-full p-2 border border-gray-200 rounded-xl text-[10px] bg-white focus:border-indigo-500 font-mono"
@@ -1582,29 +1609,87 @@ export default function AdminModules({
                 
                 <div>
                   <label className="block text-xs font-semibold text-gray-500 uppercase">Banner Website (URL)</label>
-                  <input type="text" required value={bannerUrl} onChange={(e) => setBannerUrl(e.target.value)} className="w-full p-2.5 border border-gray-200 rounded-xl text-xs bg-white mt-2" />
+                  <input type="text" value={bannerUrl} onChange={(e) => setBannerUrl(e.target.value)} placeholder="https://images.unsplash.com/photo-1438032005730-c779502df39b" className="w-full p-2.5 border border-gray-200 rounded-xl text-xs bg-white mt-2" />
+                  {bannerUrl && (
+                    <button
+                      type="button"
+                      onClick={() => setBannerUrl('')}
+                      className="mt-2 text-[10px] text-red-600 font-bold hover:underline"
+                    >
+                      Hapus Banner
+                    </button>
+                  )}
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="md:col-span-2">
                   <label className="block text-xs font-semibold text-gray-500 uppercase">Alamat Kantor Sekretariat</label>
-                  <input type="text" required value={address} onChange={(e) => setAddress(e.target.value)} className="w-full p-2.5 border border-gray-200 rounded-xl text-xs bg-white" />
+                  <input type="text" value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Masukkan alamat lengkap..." className="w-full p-2.5 border border-gray-200 rounded-xl text-xs bg-white" />
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-gray-500 uppercase">Telepon Kantor</label>
-                  <input type="text" required value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full p-2.5 border border-gray-200 rounded-xl text-xs bg-white" />
+                  <input type="text" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="Contoh: 031-8681234" className="w-full p-2.5 border border-gray-200 rounded-xl text-xs bg-white" />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-semibold text-gray-500 uppercase">Email Resmi</label>
-                  <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className="w-full p-2.5 border border-gray-200 rounded-xl text-xs bg-white" />
+                  <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="info@gereja.org" className="w-full p-2.5 border border-gray-200 rounded-xl text-xs bg-white" />
                 </div>
                 <div>
+                  <label className="block text-xs font-semibold text-gray-500 uppercase">Website Resmi (URL)</label>
+                  <input type="text" value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="https://www.gereja.org" className="w-full p-2.5 border border-gray-200 rounded-xl text-xs bg-white" />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
                   <label className="block text-xs font-semibold text-gray-500 uppercase">Link Google Maps Embed (Iframe Src)</label>
-                  <input type="text" required value={mapsEmbedUrl} onChange={(e) => setMapsEmbedUrl(e.target.value)} className="w-full p-2.5 border border-gray-200 rounded-xl text-xs bg-white" />
+                  <input type="text" value={mapsEmbedUrl} onChange={(e) => setMapsEmbedUrl(e.target.value)} placeholder="https://www.google.com/maps/embed?..." className="w-full p-2.5 border border-gray-200 rounded-xl text-xs bg-white font-mono" />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 uppercase">Teks Hak Cipta / Footer</label>
+                  <input type="text" value={footerText} onChange={(e) => setFooterText(e.target.value)} placeholder="© 2026 Hak Cipta Dilindungi." className="w-full p-2.5 border border-gray-200 rounded-xl text-xs bg-white" />
+                </div>
+              </div>
+
+              {/* SEO & Informational Meta Section */}
+              <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3">
+                <span className="text-xs font-bold uppercase text-slate-700 tracking-wider">SEO & Informasi Portal</span>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[10px] font-bold text-gray-600 uppercase">Judul SEO Website (Title)</label>
+                    <input type="text" value={seoTitle} onChange={(e) => setSeoTitle(e.target.value)} placeholder="Sistem Informasi Management Gereja (CMS)" className="w-full mt-1 p-2 border border-gray-200 rounded-xl text-xs bg-white" />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-gray-600 uppercase">Deskripsi Ringkas Portal (SEO)</label>
+                    <input type="text" value={seoDescription} onChange={(e) => setSeoDescription(e.target.value)} placeholder="Deskripsi portal informasi pelayanan jemaat..." className="w-full mt-1 p-2 border border-gray-200 rounded-xl text-xs bg-white" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Media Sosial Section */}
+              <div className="bg-blue-50/50 p-4 rounded-2xl border border-blue-100 space-y-3">
+                <span className="text-xs font-bold uppercase text-blue-900 tracking-wider">Tautan Media Sosial Resmi</span>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[10px] font-bold text-gray-600 uppercase">Instagram</label>
+                    <input type="text" value={instagram} onChange={(e) => setInstagram(e.target.value)} placeholder="https://instagram.com/..." className="w-full mt-1 p-2 border border-gray-200 rounded-xl text-xs bg-white font-mono" />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-gray-600 uppercase">YouTube</label>
+                    <input type="text" value={youtube} onChange={(e) => setYoutube(e.target.value)} placeholder="https://youtube.com/..." className="w-full mt-1 p-2 border border-gray-200 rounded-xl text-xs bg-white font-mono" />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-gray-600 uppercase">Facebook</label>
+                    <input type="text" value={facebook} onChange={(e) => setFacebook(e.target.value)} placeholder="https://facebook.com/..." className="w-full mt-1 p-2 border border-gray-200 rounded-xl text-xs bg-white font-mono" />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-gray-600 uppercase">TikTok</label>
+                    <input type="text" value={tiktok} onChange={(e) => setTiktok(e.target.value)} placeholder="https://tiktok.com/@..." className="w-full mt-1 p-2 border border-gray-200 rounded-xl text-xs bg-white font-mono" />
+                  </div>
                 </div>
               </div>
 
@@ -1627,7 +1712,7 @@ export default function AdminModules({
                   </div>
                   <div>
                     <label className="block text-[10px] font-semibold text-slate-500 uppercase mb-1">Atas Nama Rekening</label>
-                    <input type="text" placeholder="Contoh: GBI ROCK JUANDA" value={bankAccountName} onChange={(e) => setBankAccountName(e.target.value)} className="w-full p-2.5 border border-gray-200 rounded-xl text-xs bg-white focus:border-brand" />
+                    <input type="text" placeholder="Contoh: KAS GEREJA" value={bankAccountName} onChange={(e) => setBankAccountName(e.target.value)} className="w-full p-2.5 border border-gray-200 rounded-xl text-xs bg-white focus:border-brand" />
                   </div>
                 </div>
 
@@ -1639,11 +1724,36 @@ export default function AdminModules({
 
               {/* Kustomisasi Menu Sidebar Admin */}
               <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200/60 space-y-4">
-                <div className="flex items-center gap-2 text-slate-800">
-                  <Settings className="w-5 h-5 text-indigo-600" />
-                  <h4 className="font-display font-bold text-xs uppercase tracking-wide">Kustomisasi Menu Sidebar Admin</h4>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-slate-800">
+                    <Settings className="w-5 h-5 text-indigo-600" />
+                    <h4 className="font-display font-bold text-xs uppercase tracking-wide">Kustomisasi Menu Sidebar Admin & Navigasi</h4>
+                  </div>
                 </div>
-                <p className="text-[10px] text-slate-500">Atur visibilitas dan label khusus untuk seluruh menu navigasi admin di Sidebar. Perubahan akan langsung berdampak pada seluruh pengguna admin secara real-time.</p>
+                <p className="text-[10px] text-slate-500">Atur visibilitas, ubah nama tampilan, atau tambah/hapus menu kustom pada navigasi aplikasi.</p>
+
+                {/* Form Tambah Menu Baru */}
+                <div className="flex items-center gap-2 bg-white p-3 rounded-xl border border-slate-200">
+                  <input
+                    type="text"
+                    placeholder="Sebutkan Nama Menu Baru..."
+                    value={newMenuLabel}
+                    onChange={(e) => setNewMenuLabel(e.target.value)}
+                    className="flex-1 p-2 border border-slate-200 rounded-lg text-xs bg-slate-50"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (!newMenuLabel.trim()) return;
+                      const newId = 'custom_' + Date.now();
+                      setCustomMenus(prev => [...prev, { id: newId, label: newMenuLabel.trim(), visible: true }]);
+                      setNewMenuLabel('');
+                    }}
+                    className="px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-lg transition-all flex items-center gap-1 cursor-pointer"
+                  >
+                    + Tambah Menu
+                  </button>
+                </div>
                 
                 <div className="space-y-3">
                   {customMenus.map((menu, idx) => {
@@ -1664,7 +1774,7 @@ export default function AdminModules({
                             className={`w-4 h-4 text-brand focus:ring-brand border-slate-300 rounded cursor-pointer ${isRequired ? 'opacity-50 cursor-not-allowed' : ''}`}
                           />
                           <span className="text-xs font-bold text-slate-700 font-mono text-[10px] uppercase">
-                            {menu.id.replace('admin_', '').replace('_', ' ')}
+                            {menu.id.replace('admin_', '').replace('jemaat_', '').replace('_', ' ')}
                           </span>
                           {isRequired && (
                             <span className="text-[9px] bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-full font-extrabold uppercase tracking-wider">
@@ -1685,6 +1795,18 @@ export default function AdminModules({
                           }}
                           className="w-full p-1.5 px-2.5 border border-slate-200 rounded-lg text-xs bg-slate-50/50 focus:bg-white focus:border-indigo-500 font-semibold text-slate-700"
                         />
+                        {!isRequired && (
+                          <button
+                            type="button"
+                            title="Hapus Menu Ini"
+                            onClick={() => {
+                              setCustomMenus(prev => prev.filter((_, i) => i !== idx));
+                            }}
+                            className="p-1.5 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        )}
                       </div>
                     </div>
                   );
