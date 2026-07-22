@@ -26,6 +26,12 @@ import {
   Image as ImageIcon,
   User,
   X,
+  Settings,
+  Key,
+  FileText,
+  Megaphone,
+  BookOpen,
+  Calendar,
 } from 'lucide-react';
 import { MockDatabase } from './db/mockDb';
 import { Role, User as UserType, ChurchSettings } from './types';
@@ -570,8 +576,12 @@ export default function App() {
                       {/* Header */}
                       <div className="flex items-center justify-between">
                         <div>
-                          <h3 className="font-display font-black text-gray-800 text-sm">Menu Tambahan Jemaat</h3>
-                          <p className="text-[10px] text-gray-400">Pilih modul layanan yang ingin Anda akses.</p>
+                          <h3 className="font-display font-black text-gray-800 text-sm">
+                            {currentUser.role !== 'JEMAAT' ? 'Menu & Panel Pengaturan Admin' : 'Menu Layanan Jemaat'}
+                          </h3>
+                          <p className="text-[10px] text-gray-400">
+                            {currentUser.role !== 'JEMAAT' ? 'Pilih panel pengurus atau modul jemaat' : 'Pilih modul layanan yang ingin Anda akses.'}
+                          </p>
                         </div>
                         <button
                           onClick={() => setShowMobileMenu(false)}
@@ -581,36 +591,84 @@ export default function App() {
                         </button>
                       </div>
 
-                      {/* Grid of Menus */}
-                      <div className="grid grid-cols-2 gap-4 text-xs">
-                        {[
-                          { id: 'jemaat_events', label: 'Event Gereja', desc: 'Daftar kegiatan & seminar', icon: Award, color: 'text-indigo-650 bg-indigo-50' },
-                          { id: 'jemaat_donasi', label: 'Kas/Donasi', desc: 'Laporan keuangan & QRIS', icon: Coins, color: 'text-amber-600 bg-amber-50' },
-                          { id: 'jemaat_ministries', label: 'Pelayanan Jemaat', desc: 'Gabung komisi melayani', icon: Heart, color: 'text-rose-600 bg-rose-50' },
-                          { id: 'jemaat_organization', label: 'Struktur Pengurus', desc: 'Struktur majelis & visi', icon: Users, color: 'text-teal-600 bg-teal-50' },
-                          { id: 'jemaat_gallery', label: 'Galeri Media', desc: 'Dokumentasi foto kegiatan', icon: ImageIcon, color: 'text-sky-650 bg-sky-50' },
-                          { id: 'jemaat_profile', label: 'Profil Saya', desc: 'Kartu digital & detail', icon: User, color: 'text-slate-650 bg-slate-100' },
-                        ].map((menuItem) => {
-                          const Icon = menuItem.icon;
-                          return (
-                            <button
-                              key={menuItem.id}
-                              onClick={() => {
-                                setTab(menuItem.id);
-                                setShowMobileMenu(false);
-                              }}
-                              className="flex flex-col items-start p-4 bg-gray-50 hover:bg-gray-100 rounded-2xl border border-gray-150 transition-all text-left space-y-3 cursor-pointer group"
-                            >
-                              <div className={`p-3 rounded-xl transition-all group-hover:scale-105 ${menuItem.color}`}>
-                                <Icon className="w-5 h-5" />
-                              </div>
-                              <div className="space-y-0.5">
-                                <p className="font-bold text-gray-800 leading-none">{menuItem.label}</p>
-                                <span className="text-[9px] text-gray-455 block leading-tight">{menuItem.desc}</span>
-                              </div>
-                            </button>
-                          );
-                        })}
+                      {/* ADMIN MODULES SECTION IF ADMIN */}
+                      {(currentUser.role === 'ADMIN' || currentUser.role === 'SUPER_ADMIN') && (
+                        <div className="space-y-2.5 pt-1">
+                          <div className="flex items-center gap-1.5 text-amber-700 font-extrabold text-[10px] uppercase tracking-wider bg-amber-50 px-3 py-1.5 rounded-xl border border-amber-200/60">
+                            <Settings className="w-3.5 h-3.5 text-amber-600" />
+                            <span>MODUL PENGATURAN & ADMIN STAFF</span>
+                          </div>
+                          <div className="grid grid-cols-2 gap-2.5 text-xs">
+                            {[
+                              { id: 'admin_settings', label: 'Pengaturan Sistem', desc: 'Identitas, QRIS & Bank', icon: Settings, color: 'text-amber-700 bg-amber-50' },
+                              { id: 'admin_users', label: 'Kelola Akun & Sandi', desc: 'Atur password & peran', icon: Key, color: 'text-purple-700 bg-purple-50' },
+                              { id: 'admin_congregation', label: 'Data Jemaat', desc: 'Kelola database anggota', icon: Users, color: 'text-blue-700 bg-blue-50' },
+                              { id: 'admin_news', label: 'Kelola Berita', desc: 'Warta & kabar warta', icon: FileText, color: 'text-emerald-700 bg-emerald-50' },
+                              { id: 'admin_announcements', label: 'Pengumuman', desc: 'Info penting & prioritas', icon: Megaphone, color: 'text-rose-700 bg-rose-50' },
+                              { id: 'admin_events', label: 'Event & Ibadah', desc: 'Jadwal & rsvp peserta', icon: Calendar, color: 'text-indigo-700 bg-indigo-50' },
+                            ].map((m) => {
+                              const Icon = m.icon;
+                              return (
+                                <button
+                                  key={m.id}
+                                  onClick={() => {
+                                    setTab(m.id);
+                                    setShowMobileMenu(false);
+                                  }}
+                                  className="flex items-center gap-2.5 p-2.5 bg-slate-900 text-white hover:bg-slate-800 rounded-xl border border-slate-800 transition-all text-left cursor-pointer group"
+                                >
+                                  <div className={`p-2 rounded-lg flex-shrink-0 ${m.color}`}>
+                                    <Icon className="w-4 h-4" />
+                                  </div>
+                                  <div className="min-w-0">
+                                    <p className="font-bold text-slate-100 text-[11px] truncate">{m.label}</p>
+                                    <span className="text-[9px] text-slate-400 block truncate">{m.desc}</span>
+                                  </div>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Grid of Jemaat Menus */}
+                      <div className="space-y-2.5">
+                        {currentUser.role !== 'JEMAAT' && (
+                          <div className="flex items-center gap-1.5 text-indigo-700 font-extrabold text-[10px] uppercase tracking-wider bg-indigo-50 px-3 py-1.5 rounded-xl border border-indigo-200/60">
+                            <Church className="w-3.5 h-3.5 text-indigo-600" />
+                            <span>PORTAL MODUL JEMAAT</span>
+                          </div>
+                        )}
+                        <div className="grid grid-cols-2 gap-3 text-xs">
+                          {[
+                            { id: 'jemaat_events', label: 'Event Gereja', desc: 'Daftar kegiatan & seminar', icon: Award, color: 'text-indigo-650 bg-indigo-50' },
+                            { id: 'jemaat_donasi', label: 'Kas/Donasi', desc: 'Laporan keuangan & QRIS', icon: Coins, color: 'text-amber-600 bg-amber-50' },
+                            { id: 'jemaat_ministries', label: 'Pelayanan Jemaat', desc: 'Gabung komisi melayani', icon: Heart, color: 'text-rose-600 bg-rose-50' },
+                            { id: 'jemaat_organization', label: 'Struktur Pengurus', desc: 'Struktur majelis & visi', icon: Users, color: 'text-teal-600 bg-teal-50' },
+                            { id: 'jemaat_gallery', label: 'Galeri Media', desc: 'Dokumentasi foto kegiatan', icon: ImageIcon, color: 'text-sky-650 bg-sky-50' },
+                            { id: 'jemaat_profile', label: 'Profil Saya', desc: 'Kartu digital & detail', icon: User, color: 'text-slate-650 bg-slate-100' },
+                          ].map((menuItem) => {
+                            const Icon = menuItem.icon;
+                            return (
+                              <button
+                                key={menuItem.id}
+                                onClick={() => {
+                                  setTab(menuItem.id);
+                                  setShowMobileMenu(false);
+                                }}
+                                className="flex flex-col items-start p-3 bg-gray-50 hover:bg-gray-100 rounded-2xl border border-gray-150 transition-all text-left space-y-2 cursor-pointer group"
+                              >
+                                <div className={`p-2.5 rounded-xl transition-all group-hover:scale-105 ${menuItem.color}`}>
+                                  <Icon className="w-4 h-4" />
+                                </div>
+                                <div className="space-y-0.5">
+                                  <p className="font-bold text-gray-800 leading-none text-xs">{menuItem.label}</p>
+                                  <span className="text-[9px] text-gray-450 block leading-tight">{menuItem.desc}</span>
+                                </div>
+                              </button>
+                            );
+                          })}
+                        </div>
                       </div>
 
                       {/* Quick actions line */}

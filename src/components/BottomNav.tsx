@@ -78,37 +78,50 @@ export default function BottomNav({
 
         {/* Menu or Admin portal button */}
         {userRole !== 'JEMAAT' ? (
-          <button
-            onClick={() => {
-              // Direct toggle to administrative main panel or toggle administrative menu
-              if (currentTab.startsWith('admin_')) {
-                setTab('jemaat_home');
-              } else {
-                setTab('admin_dashboard');
-              }
-            }}
-            className="flex flex-col items-center justify-center flex-1 h-full py-1 text-center relative"
-          >
-            <div
-              className={`p-1.5 rounded-xl transition-all ${
-                currentTab.startsWith('admin_')
-                  ? 'text-amber-600 bg-amber-50 scale-110'
-                  : 'text-gray-400 hover:text-gray-600'
-              }`}
+          <>
+            <button
+              onClick={() => {
+                if (!currentTab.startsWith('admin_')) {
+                  setTab('admin_dashboard');
+                } else if (openAdminMenu) {
+                  openAdminMenu();
+                }
+              }}
+              className="flex flex-col items-center justify-center flex-1 h-full py-1 text-center relative cursor-pointer"
             >
-              <Shield className="w-5 h-5" />
-            </div>
-            <span
-              className={`text-[9px] font-medium tracking-tight mt-0.5 ${
-                currentTab.startsWith('admin_') ? 'text-amber-600 font-semibold' : 'text-gray-400'
-              }`}
+              <div
+                className={`p-1.5 rounded-xl transition-all ${
+                  currentTab.startsWith('admin_')
+                    ? 'text-amber-600 bg-amber-50 scale-110'
+                    : 'text-gray-400 hover:text-gray-600'
+                }`}
+              >
+                <Shield className="w-5 h-5" />
+              </div>
+              <span
+                className={`text-[9px] font-medium tracking-tight mt-0.5 ${
+                  currentTab.startsWith('admin_') ? 'text-amber-600 font-semibold' : 'text-gray-400'
+                }`}
+              >
+                Panel Admin
+              </span>
+              {currentTab.startsWith('admin_') && (
+                <span className="absolute bottom-0 w-8 h-1 bg-amber-500 rounded-full" />
+              )}
+            </button>
+
+            <button
+              onClick={openAdminMenu}
+              className="flex flex-col items-center justify-center flex-1 h-full py-1 text-center relative cursor-pointer"
             >
-              Portal Admin
-            </span>
-            {currentTab.startsWith('admin_') && (
-              <span className="absolute bottom-0 w-8 h-1 bg-amber-500 rounded-full" />
-            )}
-          </button>
+              <div className="p-1.5 rounded-xl text-gray-400 hover:text-gray-600 transition-all">
+                <Menu className="w-5 h-5" />
+              </div>
+              <span className="text-[9px] font-medium tracking-tight mt-0.5 text-gray-400">
+                Menu Lain
+              </span>
+            </button>
+          </>
         ) : (
           <button
             onClick={openAdminMenu}

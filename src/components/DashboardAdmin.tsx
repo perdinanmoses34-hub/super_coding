@@ -167,6 +167,51 @@ export default function DashboardAdmin({ setTab, currentUser, settings }: Dashbo
         </div>
       </div>
 
+      {/* MOBILE & DESKTOP ADMIN MODULE SELECTOR BAR */}
+      <div className="bg-[#0F172A] text-white p-3.5 sm:p-4 rounded-3xl shadow-lg border border-slate-800">
+        <div className="flex items-center justify-between gap-2 mb-2.5 px-1">
+          <div className="flex items-center gap-2">
+            <span className="p-1.5 bg-amber-500/20 text-amber-400 rounded-xl text-xs font-black">
+              ⚙️
+            </span>
+            <div>
+              <h3 className="text-xs sm:text-sm font-black uppercase tracking-wider text-slate-100">
+                Pilih Panel Pengaturan & Modul Admin
+              </h3>
+              <p className="text-[10px] text-slate-400 font-medium">
+                Geser ke samping & tap untuk langsung menuju panel yang diinginkan
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar scroll-smooth">
+          {[
+            { id: 'admin_dashboard', label: '📊 Dashboard Admin' },
+            { id: 'admin_settings', label: '⚙️ Pengaturan Sistem' },
+            { id: 'admin_users', label: '🔑 Kelola Akun & Sandi' },
+            { id: 'admin_congregation', label: '👥 Data Jemaat' },
+            { id: 'admin_news', label: '📰 Kelola Berita' },
+            { id: 'admin_announcements', label: '📣 Kelola Pengumuman' },
+            { id: 'admin_events', label: '📅 Event & Ibadah' },
+            { id: 'admin_devotions', label: '📖 Renungan' },
+            { id: 'admin_ministries', label: '🤝 Kelola Pelayanan' },
+            { id: 'admin_organizations', label: '🏢 Organisasi' },
+            { id: 'admin_gallery', label: '🖼️ Kelola Galeri' },
+            { id: 'admin_notifications', label: '🔔 Kirim Notifikasi' },
+            { id: 'admin_comments', label: '💬 Moderasi Komentar' },
+          ].map((m) => (
+            <button
+              key={m.id}
+              onClick={() => setTab(m.id)}
+              className="px-3.5 py-2 bg-slate-800/80 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-700/60 rounded-2xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer hover:border-amber-500/50"
+            >
+              {m.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Real-time Stats Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Jemaat */}

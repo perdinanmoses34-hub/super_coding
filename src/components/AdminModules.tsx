@@ -30,6 +30,7 @@ import {
   Eye,
   QrCode,
   CheckCircle2,
+  Smartphone,
 } from 'lucide-react';
 import { MockDatabase } from '../db/mockDb';
 import {
@@ -681,7 +682,63 @@ export default function AdminModules({
   };
 
   return (
-    <div className="bg-white rounded-3xl border border-gray-100 p-6 shadow-sm min-h-[500px]">
+    <div className="space-y-6">
+      {/* MOBILE & DESKTOP ADMIN MODULE SELECTOR BAR */}
+      <div className="bg-slate-900 text-white p-3.5 sm:p-4 rounded-3xl shadow-lg border border-slate-800">
+        <div className="flex items-center justify-between gap-2 mb-3 px-1">
+          <div className="flex items-center gap-2">
+            <span className="p-1.5 bg-amber-500/20 text-amber-400 rounded-xl text-xs font-black">
+              ⚙️
+            </span>
+            <div>
+              <h3 className="text-xs sm:text-sm font-black uppercase tracking-wider text-slate-100">
+                Pilih Panel Pengaturan & Modul Admin
+              </h3>
+              <p className="text-[10px] text-slate-400 font-medium">
+                Geser/swipe ke samping untuk berpindah panel pengaturan secara langsung
+              </p>
+            </div>
+          </div>
+          <span className="hidden sm:inline-block text-[10px] bg-slate-800 text-slate-300 px-2.5 py-1 rounded-full border border-slate-700 font-mono">
+            {activeTab}
+          </span>
+        </div>
+
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar scroll-smooth">
+          {[
+            { id: 'admin_dashboard', label: '📊 Dashboard Admin' },
+            { id: 'admin_settings', label: '⚙️ Pengaturan Sistem' },
+            { id: 'admin_users', label: '🔑 Kelola Akun & Sandi' },
+            { id: 'admin_congregation', label: '👥 Data Jemaat' },
+            { id: 'admin_news', label: '📰 Kelola Berita' },
+            { id: 'admin_announcements', label: '📣 Kelola Pengumuman' },
+            { id: 'admin_events', label: '📅 Event & Ibadah' },
+            { id: 'admin_devotions', label: '📖 Renungan' },
+            { id: 'admin_ministries', label: '🤝 Kelola Pelayanan' },
+            { id: 'admin_organizations', label: '🏢 Organisasi' },
+            { id: 'admin_gallery', label: '🖼️ Kelola Galeri' },
+            { id: 'admin_notifications', label: '🔔 Kirim Notifikasi' },
+            { id: 'admin_comments', label: '💬 Moderasi Komentar' },
+          ].map((m) => {
+            const isActive = activeTab === m.id;
+            return (
+              <button
+                key={m.id}
+                onClick={() => setTab(m.id)}
+                className={`px-3.5 py-2 rounded-2xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer ${
+                  isActive
+                    ? 'bg-amber-500 text-slate-950 font-black shadow-lg scale-105 ring-2 ring-amber-400/50'
+                    : 'bg-slate-800/80 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-700/60'
+                }`}
+              >
+                {m.label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="bg-white rounded-3xl border border-gray-100 p-6 shadow-sm min-h-[500px]">
       {/* MODULES HEADER */}
       <div className="flex items-center justify-between border-b border-gray-100 pb-4 mb-6">
         <div>
@@ -1365,6 +1422,40 @@ export default function AdminModules({
           {/* Pengaturan Sistem */}
           {activeTab === 'admin_settings' && (currentUser.role === 'SUPER_ADMIN' || currentUser.role === 'ADMIN') && (
             <div className="space-y-8">
+              {/* EXPLANATION & SYNC CARD FOR DESKTOP VS MOBILE */}
+              <div className="bg-gradient-to-r from-indigo-950 via-slate-900 to-blue-950 text-white p-5 rounded-3xl border border-indigo-500/30 space-y-3 shadow-md max-w-2xl mx-auto">
+                <div className="flex items-center gap-2 text-indigo-300">
+                  <Smartphone className="w-5 h-5 text-indigo-400" />
+                  <h3 className="font-bold text-xs uppercase tracking-wider text-indigo-200">
+                    Petunjuk Sinkronisasi Data Komputer vs HP Android
+                  </h3>
+                </div>
+                <p className="text-xs text-slate-300 leading-relaxed font-medium">
+                  Aplikasi ini berjalan sebagai <strong>Web App / PWA</strong> di hosting GitHub Pages.
+                </p>
+                <div className="bg-slate-950/80 p-3.5 rounded-2xl border border-slate-800/80 text-[11px] text-slate-300 space-y-2">
+                  <p className="font-bold text-amber-400">💡 Kenapa data di Komputer & HP berbeda saat pertama dibuka?</p>
+                  <p className="text-slate-300 leading-snug">
+                    Secara default, browser Komputer dan HP Android menyimpan data secara lokal di perangkat masing-masing (<i>localStorage</i>).
+                  </p>
+                  <p className="font-bold text-emerald-400 mt-2">🚀 Cara Menyamakan Data Komputer & HP Android (2 Cara Mudah):</p>
+                  <ul className="list-disc pl-4 space-y-1 text-slate-300">
+                    <li>
+                      <strong>Cara 1 (Instan via Backup/Restore JSON):</strong>
+                      <br />
+                      Di Komputer: Masuk ke panel <i>Backup & Restore</i>, klik <strong>"Ambil Backup Database"</strong>.
+                      <br />
+                      Di HP Android: Buka web ini, masuk ke panel <i>Backup & Restore</i>, lalu jalankan <strong>"Restorasi Database"</strong>. Seluruh data jemaat, berita, & akun langsung sama 100%!
+                    </li>
+                    <li>
+                      <strong>Cara 2 (Live Cloud Sync via Google Sheet):</strong>
+                      <br />
+                      Gunakan panel <i>Sinkronisasi Google Sheet</i> di bawah ini untuk menghubungkan spreadsheet online.
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
               <form onSubmit={handleSaveSettings} className="space-y-6 max-w-2xl mx-auto">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -2437,6 +2528,7 @@ export default function AdminModules({
               )}
             </div>
           )}
+      </div>
     </div>
   );
 }
