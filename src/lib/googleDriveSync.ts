@@ -70,29 +70,42 @@ export const signOutGoogleDrive = async () => {
   sessionStorage.removeItem('gdrive_access_token');
 };
 
-// Search for church_cms_database.json inside folder ID
+// Search for church_cms_database.json inside folder ID or user's Drive
 export const findDatabaseFile = async (accessToken: string): Promise<string | null> => {
   try {
-    // We search inside the specific folder and check for the exact file name
-    const query = encodeURIComponent(`'${FOLDER_ID}' in parents and name = '${FILE_NAME}' and trashed = false`);
-    const url = `https://www.googleapis.com/drive/v3/files?q=${query}&fields=files(id,name)`;
+    // 1. Try search inside specific folder ID
+    let query = encodeURIComponent(`'${FOLDER_ID}' in parents and name = '${FILE_NAME}' and trashed = false`);
+    let url = `https://www.googleapis.com/drive/v3/files?q=${query}&fields=files(id,name)`;
     
-    const res = await fetch(url, {
+    let res = await fetch(url, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
     });
 
-    if (!res.ok) {
-      const errText = await res.text();
-      console.error('Error finding file on Drive:', errText);
-      throw new Error(`Google Drive API error: ${res.statusText}`);
+    if (res.ok) {
+      const data = await res.json();
+      if (data.files && data.files.length > 0) {
+        return data.files[0].id;
+      }
     }
 
-    const data = await res.json();
-    if (data.files && data.files.length > 0) {
-      return data.files[0].id;
+    // 2. Fallback: Search anywhere in user's Drive for church_cms_database.json
+    query = encodeURIComponent(`name = '${FILE_NAME}' and trashed = false`);
+    url = `https://www.googleapis.com/drive/v3/files?q=${query}&fields=files(id,name)`;
+    res = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      if (data.files && data.files.length > 0) {
+        return data.files[0].id;
+      }
     }
+
     return null;
   } catch (e) {
     console.error('findDatabaseFile failed:', e);
@@ -144,35 +157,48 @@ export const uploadDatabaseFile = async (
 
     return fileId;
   } else {
-    // File doesn't exist, perform multipart upload (POST)
-    const metadata = {
-      name: FILE_NAME,
-      parents: [FOLDER_ID],
-      mimeType: 'application/json',
+    // Helper function for multipart file creation
+    const createFileRequest = async (parents?: string[]) => {
+      const metadata: any = {
+        name: FILE_NAME,
+        mimeType: 'application/json',
+      };
+      if (parents && parents.length > 0) {
+        metadata.parents = parents;
+      }
+
+      const boundary = 'gdrive_sync_multipart_boundary';
+      const delimiter = `\r\n--${boundary}\r\n`;
+      const close_delim = `\r\n--${boundary}--`;
+
+      const body =
+        delimiter +
+        'Content-Type: application/json; charset=UTF-8\r\n\r\n' +
+        JSON.stringify(metadata) +
+        delimiter +
+        'Content-Type: application/json\r\n\r\n' +
+        JSON.stringify(dbData) +
+        close_delim;
+
+      const url = 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart';
+      return await fetch(url, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': `multipart/related; boundary=${boundary}`,
+        },
+        body: body,
+      });
     };
 
-    const boundary = 'gdrive_sync_multipart_boundary';
-    const delimiter = `\r\n--${boundary}\r\n`;
-    const close_delim = `\r\n--${boundary}--`;
+    // Try creating in specific folder first
+    let res = await createFileRequest([FOLDER_ID]);
 
-    const body =
-      delimiter +
-      'Content-Type: application/json; charset=UTF-8\r\n\r\n' +
-      JSON.stringify(metadata) +
-      delimiter +
-      'Content-Type: application/json\r\n\r\n' +
-      JSON.stringify(dbData) +
-      close_delim;
-
-    const url = 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart';
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'Content-Type': `multipart/related; boundary=${boundary}`,
-      },
-      body: body,
-    });
+    // Fallback: If folder creation fails (e.g. 403 or 404 access denied on shared folder), create in root Drive
+    if (!res.ok) {
+      console.warn('Uploading to specific folder failed, attempting fallback upload to root Drive...');
+      res = await createFileRequest();
+    }
 
     if (!res.ok) {
       const errText = await res.text();
@@ -180,7 +206,7 @@ export const uploadDatabaseFile = async (
       throw new Error(`Gagal mengunggah database ke Google Drive: ${res.statusText}`);
     }
 
-    const result = await res.json();
-    return result.id;
+    const data = await res.json();
+    return data.id;
   }
 };

@@ -647,26 +647,27 @@ export default function AdminModules({
   };
 
   const handleGDriveSync = async (direction: 'pull' | 'push') => {
-    if (!gdriveToken) return;
-    const directionWord = direction === 'pull' ? 'MENGUNDUH (PULL)' : 'MENGUNGGAH (PUSH)';
-    const msg = direction === 'pull'
-      ? "Apakah Anda yakin ingin MENGUNDUH data dari Google Drive? Tindakan ini akan menimpa seluruh data lokal aplikasi Anda saat ini."
-      : "Apakah Anda yakin ingin MENGUNGGAH data ke Google Drive? Tindakan ini akan menimpa file database di Google Drive Anda.";
+    const token = gdriveToken || (typeof window !== 'undefined' ? sessionStorage.getItem('gdrive_access_token') : null);
+    if (!token) {
+      setGdriveSyncLogs(prev => [
+        ...prev,
+        "✖ Token Google Drive tidak ditemukan. Silakan klik 'Hubungkan Google Drive Saya' terlebih dahulu."
+      ]);
+      return;
+    }
 
-    if (!window.confirm(msg)) return;
+    const directionWord = direction === 'pull' ? 'MENGUNDUH (PULL)' : 'MENGUNGGAH (PUSH)';
 
     setIsSyncingGDrive(true);
     setGdriveSyncLogs(prev => [...prev, `Memulai sinkronisasi: ${directionWord}...`]);
     try {
-      const res = await MockDatabase.syncWithGoogleDrive(gdriveToken, direction);
+      const res = await MockDatabase.syncWithGoogleDrive(token, direction);
       if (res.success) {
         setGdriveSyncLogs(prev => [...prev, `✔ ${res.message}`]);
         loadAllData();
         onSettingsSaved(MockDatabase.getSettings());
-        alert(res.message);
       } else {
         setGdriveSyncLogs(prev => [...prev, `✖ ${res.message}`]);
-        alert(res.message);
       }
     } catch (err: any) {
       setGdriveSyncLogs(prev => [...prev, `✖ Gagal: ${err.message || err}`]);
