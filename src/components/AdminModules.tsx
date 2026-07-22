@@ -1151,11 +1151,28 @@ export default function AdminModules({
           {/* Kelola Akun & Sandi List */}
           {activeTab === 'admin_users' && (
             <div className="space-y-4">
-              <div className="p-3.5 bg-indigo-50 text-indigo-900 border border-indigo-100 rounded-2xl flex items-start gap-2.5">
-                <AlertCircle className="w-4 h-4 text-indigo-600 flex-shrink-0 mt-0.5" />
-                <p className="text-[10px] leading-relaxed">
-                  Semua akun di bawah ini dapat digunakan untuk login ke portal jemaat maupun admin. Sebagai pengurus, Anda dapat memantau, merubah, dan melihat kata sandi masing-masing akun (Jemaat, Admin, Superadmin) demi kelancaran pelayanan.
-                </p>
+              <div className="p-3.5 bg-indigo-50 text-indigo-900 border border-indigo-100 rounded-2xl flex items-start justify-between gap-3 flex-wrap sm:flex-nowrap">
+                <div className="flex items-start gap-2.5">
+                  <AlertCircle className="w-4 h-4 text-indigo-600 flex-shrink-0 mt-0.5" />
+                  <p className="text-[10px] leading-relaxed">
+                    Sistem Manajemen Akun & Hak Akses. Pengurus dapat mengelola username (email), mengubah kata sandi, meriset akses, dan mengatur peran (Super Admin, Admin Staff, Jemaat) secara langsung.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (confirm('Atur ulang kata sandi seluruh akun pengguna ke standar "church123"?')) {
+                      users.forEach((u) => {
+                        MockDatabase.saveUser({ ...u, password: 'church123' }, currentUser);
+                      });
+                      loadAllData();
+                      alert('Berhasil mengatur ulang seluruh kata sandi pengguna ke "church123"!');
+                    }
+                  }}
+                  className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-[9px] uppercase tracking-wider rounded-xl shadow-sm transition-all flex-shrink-0 cursor-pointer"
+                >
+                  🔄 Reset Semua Sandi ke Standar
+                </button>
               </div>
 
               <div className="space-y-3">
@@ -1177,14 +1194,28 @@ export default function AdminModules({
                           </span>
                         </div>
                         <div className="mt-1 flex flex-col gap-0.5 sm:flex-row sm:items-center sm:gap-4 text-[10px] text-gray-500">
-                          <span><strong>Email:</strong> {item.email}</span>
-                          <span><strong>Sandi:</strong> <code className="bg-slate-100 px-1.5 py-0.5 rounded text-amber-600 font-mono font-semibold">{item.password || 'church123'}</code></span>
+                          <span><strong>Email / Username:</strong> <code className="text-slate-800 font-mono font-medium">{item.email}</code></span>
+                          <span><strong>Kata Sandi:</strong> <code className="bg-amber-50 border border-amber-200/60 px-1.5 py-0.5 rounded text-amber-700 font-mono font-bold select-all">{item.password || 'church123'}</code></span>
                         </div>
                       </div>
                     </div>
                     <div className="flex items-center gap-1.5 self-end sm:self-auto">
-                      <button onClick={() => setEditingItem(item)} className="p-2 bg-white hover:bg-blue-50 border border-gray-100 text-gray-500 hover:text-blue-600 hover:border-blue-200 rounded-xl transition-colors" title="Edit Akun"><Edit2 className="w-3.5 h-3.5" /></button>
-                      <button onClick={() => handleDeleteUser(item.id)} className="p-2 bg-white hover:bg-red-50 border border-gray-100 text-gray-500 hover:text-red-600 hover:border-red-200 rounded-xl transition-colors" title="Hapus Akun"><Trash2 className="w-3.5 h-3.5" /></button>
+                      <button
+                        onClick={() => {
+                          const newPassword = prompt(`Masukkan kata sandi baru untuk ${item.name} (${item.email}):`, item.password || 'church123');
+                          if (newPassword !== null && newPassword.trim() !== '') {
+                            MockDatabase.saveUser({ ...item, password: newPassword.trim() }, currentUser);
+                            loadAllData();
+                            alert(`Kata sandi untuk ${item.name} berhasil diperbarui menjadi "${newPassword.trim()}"!`);
+                          }
+                        }}
+                        className="px-2.5 py-1.5 bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-800 text-[10px] font-bold rounded-xl transition-colors cursor-pointer"
+                        title="Atur Ulang Kata Sandi"
+                      >
+                        🔑 Ganti Sandi
+                      </button>
+                      <button onClick={() => setEditingItem(item)} className="p-2 bg-white hover:bg-blue-50 border border-gray-100 text-gray-500 hover:text-blue-600 hover:border-blue-200 rounded-xl transition-colors cursor-pointer" title="Edit Data Akun"><Edit2 className="w-3.5 h-3.5" /></button>
+                      <button onClick={() => handleDeleteUser(item.id)} className="p-2 bg-white hover:bg-red-50 border border-gray-100 text-gray-500 hover:text-red-600 hover:border-red-200 rounded-xl transition-colors cursor-pointer" title="Hapus Akun"><Trash2 className="w-3.5 h-3.5" /></button>
                     </div>
                   </div>
                 ))}

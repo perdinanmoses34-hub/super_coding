@@ -213,10 +213,17 @@ export default function App() {
   // Simulated Login Submit
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    const matched = allUsers.find((u) => u.email.toLowerCase() === loginEmail.toLowerCase());
+    const cleanEmail = loginEmail.trim().toLowerCase();
+    const cleanPassword = loginPassword.trim();
+
+    // Fetch fresh user list from MockDatabase (which auto-heals default users)
+    const freshUsers = MockDatabase.getUsers();
+    setAllUsers(freshUsers);
+
+    const matched = freshUsers.find((u) => u.email.toLowerCase() === cleanEmail);
     if (matched) {
-      const correctPassword = matched.password || 'church123';
-      if (loginPassword === correctPassword) {
+      const correctPassword = (matched.password || 'church123').trim();
+      if (cleanPassword === correctPassword) {
         setCurrentUser(matched);
         setIsLocked(false);
         if (matched.role === 'SUPER_ADMIN' || matched.role === 'ADMIN') {
@@ -226,10 +233,25 @@ export default function App() {
         }
         MockDatabase.addLog(matched, 'LOGIN');
       } else {
-        alert('Kata sandi salah! Silakan coba lagi atau klik "LUPA PASSWORD" untuk menghubungi admin.');
+        alert('Kata sandi salah! Silakan periksa kembali atau gunakan tombol "GUNAKAN" pada akun demo di bawah.');
       }
     } else {
-      alert('Alamat email tidak terdaftar! Silakan hubungi admin untuk mendaftarkan akun Anda.');
+      // Fallback auto-recovery check for default emails
+      if (cleanEmail === 'admin@church.com' || cleanEmail === 'superadmin@church.com' || cleanEmail === 'jemaat@church.com') {
+        MockDatabase.loadFromServer().then(() => {
+          const reloadedUsers = MockDatabase.getUsers();
+          setAllUsers(reloadedUsers);
+          const retryMatched = reloadedUsers.find((u) => u.email.toLowerCase() === cleanEmail);
+          if (retryMatched && (cleanPassword === (retryMatched.password || 'church123').trim())) {
+            setCurrentUser(retryMatched);
+            setIsLocked(false);
+            setTab((retryMatched.role === 'SUPER_ADMIN' || retryMatched.role === 'ADMIN') ? 'admin_dashboard' : 'jemaat_home');
+            MockDatabase.addLog(retryMatched, 'LOGIN');
+            return;
+          }
+        });
+      }
+      alert(`Alamat email "${loginEmail}" belum terdaftar. Silakan gunakan akun demo yang tersedia di bawah ini.`);
     }
   };
 
@@ -454,6 +476,22 @@ export default function App() {
                           <p className="text-[9px] text-amber-500 font-extrabold tracking-wide text-center leading-relaxed">
                             * SANDI BAWAAN SEMUA AKUN: <span className="font-mono bg-amber-500/10 px-1.5 py-0.5 rounded text-amber-400 text-[10px] select-all font-black">church123</span>
                           </p>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (confirm('Atur ulang seluruh akun login (Superadmin, Admin, Jemaat) ke kata sandi standar "church123"?')) {
+                                localStorage.removeItem('church_cms_users');
+                                MockDatabase.loadFromServer().then(() => {
+                                  setAllUsers(MockDatabase.getUsers());
+                                  alert('Berhasil mengatur ulang akun login! Silakan coba login kembali.');
+                                });
+                              }
+                            }}
+                            className="w-full mt-2 py-2 bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-700/60 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-colors cursor-pointer"
+                          >
+                            🔄 RESET AKUN LOGIN KE STANDAR
+                          </button>
                         </div>
                       )}
                     </div>

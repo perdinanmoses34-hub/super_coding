@@ -975,7 +975,29 @@ export class MockDatabase {
   }
 
   static getUsers(): User[] {
-    return this.getStored('users', DEFAULT_USERS);
+    const stored = this.getStored<User[]>('users', DEFAULT_USERS);
+    let changed = false;
+    const users = Array.isArray(stored) ? [...stored] : [...DEFAULT_USERS];
+
+    DEFAULT_USERS.forEach((defUser) => {
+      const idx = users.findIndex(
+        (u) => u.email.toLowerCase() === defUser.email.toLowerCase() || u.id === defUser.id
+      );
+      if (idx === -1) {
+        users.push(defUser);
+        changed = true;
+      } else {
+        if (!users[idx].password) {
+          users[idx].password = defUser.password || 'church123';
+          changed = true;
+        }
+      }
+    });
+
+    if (changed) {
+      this.setStored('users', users);
+    }
+    return users;
   }
 
   static saveUser(user: User, actor?: { id: string; name: string; role: Role }) {
