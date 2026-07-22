@@ -7,7 +7,7 @@ interface PwaInstallAndSplashProps {
   logoUrl?: string;
 }
 
-export default function PwaInstallAndSplash({ churchName = 'CMS Gereja Indonesia', logoUrl }: PwaInstallAndSplashProps) {
+export default function PwaInstallAndSplash({ churchName = 'SYSTEM MANAGEMENT CHURCH (CMS)', logoUrl }: PwaInstallAndSplashProps) {
   // Splash Screen States
   const [showSplash, setShowSplash] = useState(true);
   const [splashProgress, setSplashProgress] = useState(10);
@@ -131,11 +131,11 @@ export default function PwaInstallAndSplash({ churchName = 'CMS Gereja Indonesia
               </motion.div>
 
               <div className="space-y-1.5">
-                <h1 className="text-xl sm:text-2xl font-black tracking-tight bg-gradient-to-r from-amber-200 via-white to-amber-100 bg-clip-text text-transparent">
-                  {churchName}
+                <h1 className="text-xl sm:text-2xl font-black tracking-tight bg-gradient-to-r from-amber-200 via-white to-amber-100 bg-clip-text text-transparent uppercase">
+                  SYSTEM MANAGEMENT CHURCH (CMS)
                 </h1>
                 <p className="text-xs text-slate-400 font-medium tracking-wide uppercase">
-                  Aplikasi Pelayanan & Manajemen Jemaat
+                  {churchName && churchName !== 'SYSTEM MANAGEMENT CHURCH (CMS)' ? churchName : 'Aplikasi Pelayanan & Manajemen Jemaat'}
                 </p>
               </div>
 
